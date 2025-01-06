@@ -1,21 +1,21 @@
-# Modelo de Retención de Clientes: Análisis de Model Fitness
+# Customer Retention Model: Model Fitness Analysis
 
 ---
 
-## 🌟 **Introducción**
+## 🌟 **Introduction**
 
-Model Fitness, una cadena de gimnasios, busca mejorar la retención de clientes analizando factores que influyen en la rotación ("churn") y formulando estrategias basadas en datos. Este proyecto tiene como objetivos principales:
+Model Fitness, a gym chain, aims to improve customer retention by analyzing factors that influence churn and formulating data-driven strategies. The main objectives of this project are:
 
-- **Analizar perfiles de clientes** para entender patrones de comportamiento.
-- **Predecir la probabilidad de rotación** utilizando modelos de clasificación.
-- **Segmentar clientes** para diseñar estrategias personalizadas.
-- **Recomendar acción basadas en los resultados obtenidos.**
+- **Analyze customer profiles** to understand behavioral patterns.
+- **Predict churn probability** using classification models.
+- **Segment customers** to design personalized strategies.
+- **Recommend actions based on the findings.**
 
 ---
 
-## 📊 **Paso 1: Exploración y Preparación de Datos**
+## 📊 **Step 1: Data Exploration and Preparation**
 
-### 1.1 **Carga de Librerías y Dataset**
+### 1.1 **Libraries and Dataset Loading**
 ```python
 import pandas as pd
 import numpy as np
@@ -29,14 +29,14 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.cluster import KMeans
 from scipy.cluster.hierarchy import dendrogram, linkage
 
-# Carga del dataset
+# Load dataset
 df = pd.read_csv('/datasets/gym_churn_us.csv')
 ```
 
-### 1.2 **Revisión Inicial del Dataset**
-- **Tamaño y Columnas:** 4000 registros, 14 columnas.
-- **Columnas relevantes:** Género, Edad, Duración del contrato, Gasto adicional promedio, Frecuencia de visitas, entre otras.
-- **Datos completos:** No se encontraron valores nulos ni duplicados.
+### 1.2 **Initial Dataset Review**
+- **Size and Columns:** 4000 records, 14 columns.
+- **Relevant Columns:** Gender, Age, Contract Duration, Average Additional Charges, Visit Frequency, among others.
+- **Complete Data:** No missing or duplicate values.
 
 ```python
 print(df.info())
@@ -45,29 +45,29 @@ print(df.describe())
 
 ---
 
-## 🌄 **Paso 2: Análisis Exploratorio**
+## 🌄 **Step 2: Exploratory Analysis**
 
-### 2.1 **Distribución de Variables**
+### 2.1 **Variable Distribution**
 
-#### Variables Discretas
-- Los clientes cerca de la ubicación tienen menor probabilidad de cancelar.
-- Contratos más largos están vinculados a menores tasas de cancelación.
+#### Discrete Variables
+- Customers near the location are less likely to churn.
+- Longer contracts are linked to lower churn rates.
 
-#### Variables Continuas
-- **Edad:** Los clientes jóvenes tienen mayor probabilidad de cancelar.
-- **Gasto Adicional Promedio:** Un mayor gasto adicional está asociado con retención.
-- **Frecuencia de Clases:** Clientes con mayor asistencia muestran menor probabilidad de cancelar.
+#### Continuous Variables
+- **Age:** Younger customers are more likely to churn.
+- **Average Additional Charges:** Higher additional spending is associated with retention.
+- **Class Frequency:** Customers with higher attendance show lower churn rates.
 
 ```python
-# Histogramas de variables continuas
+# Histograms for continuous variables
 for column in ['Age', 'Avg_additional_charges_total']:
     sns.histplot(data=df, x=column, hue='Churn', kde=True)
     plt.show()
 ```
 
-### 2.2 **Matriz de Correlación**
-- **Observaciones Clave:**
-  - Las variables "Duración del Contrato" y "Frecuencia de Visitas" tienen una fuerte correlación negativa con "Churn".
+### 2.2 **Correlation Matrix**
+- **Key Observations:**
+  - Variables like "Contract Duration" and "Visit Frequency" have a strong negative correlation with "Churn".
 
 ```python
 sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
@@ -76,9 +76,9 @@ plt.show()
 
 ---
 
-## 🔧 **Paso 3: Modelos Predictivos**
+## 🔧 **Step 3: Predictive Models**
 
-### 3.1 **División de Datos y Escalado**
+### 3.1 **Data Splitting and Scaling**
 ```python
 X = df.drop(columns=['Churn'])
 y = df['Churn']
@@ -89,8 +89,8 @@ X_train_st = scaler.fit_transform(X_train)
 X_test_st = scaler.transform(X_test)
 ```
 
-### 3.2 **Evaluación de Modelos**
-#### Regresión Logística
+### 3.2 **Model Evaluation**
+#### Logistic Regression
 ```python
 lr_model = LogisticRegression(random_state=42, max_iter=1000)
 lr_model.fit(X_train_st, y_train)
@@ -98,7 +98,7 @@ lr_predictions = lr_model.predict(X_test_st)
 evaluate_model(y_test, lr_predictions)
 ```
 
-#### Bosque Aleatorio
+#### Random Forest
 ```python
 rf_model = RandomForestClassifier(random_state=42)
 rf_model.fit(X_train, y_train)
@@ -106,21 +106,21 @@ rf_predictions = rf_model.predict(X_test)
 evaluate_model(y_test, rf_predictions)
 ```
 
-### 3.3 **Resultados de Evaluación**
-| Modelo                | Exactitud | Precisión | Sensibilidad |
+### 3.3 **Evaluation Results**
+| Model                | Accuracy | Precision | Recall |
 |-----------------------|-----------|-------------|--------------|
-| Regresión Logística | 0.92      | 0.87        | 0.78         |
-| Bosque Aleatorio      | 0.91      | 0.85        | 0.78         |
+| Logistic Regression | 0.92      | 0.87        | 0.78         |
+| Random Forest       | 0.91      | 0.85        | 0.78         |
 
 ---
 
-## 🌿 **Paso 4: Análisis de Segmentación**
+## 🌿 **Step 4: Segmentation Analysis**
 
-### 4.1 **Clustering con K-Means**
-- **Configuración de Clústeres:** Se definieron 5 clústeres utilizando el método de "Elbow".
-- **Análisis de clústeres:**
-  - Clientes con contratos largos y alta frecuencia tienen menor probabilidad de cancelar.
-  - Los clústeres con mayor "Churn" tienen menor participación en clases grupales y menos gasto adicional.
+### 4.1 **Clustering with K-Means**
+- **Cluster Configuration:** 5 clusters were defined using the "Elbow Method".
+- **Cluster Analysis:**
+  - Customers with longer contracts and higher frequency are less likely to churn.
+  - Clusters with higher churn have lower group class participation and additional spending.
 
 ```python
 kmeans = KMeans(n_clusters=5, random_state=42)
@@ -129,23 +129,21 @@ df['Cluster'] = kmeans.fit_predict(X_scaled)
 
 ---
 
-## 🌟 **Conclusión y Recomendaciones**
+## 🌟 **Conclusion and Recommendations**
 
-### Observaciones Principales
-1. **Frecuencia de Visitas:** Los clientes con mayor asistencia tienen menor probabilidad de cancelar.
-2. **Duración del Contrato:** Contratos largos están asociados a menor "Churn".
-3. **Segmentación:** Los clústeres con menor "Churn" muestran alta participación en clases y gasto adicional.
+### Key Observations
+1. **Visit Frequency:** Customers with higher attendance are less likely to churn.
+2. **Contract Duration:** Longer contracts are associated with lower churn.
+3. **Segmentation:** Clusters with lower churn exhibit high class participation and additional spending.
 
-### Recomendaciones
-1. **Incentivar Contratos Largos:** Ofrecer descuentos o beneficios exclusivos para contratos de 6 o 12 meses.
-2. **Promover Clases Grupales:** Incrementar la oferta y hacer promociones.
-3. **Segmentación Efectiva:** Personalizar estrategias basadas en los clústeres identificados.
-4. **Monitoreo Proactivo:** Identificar clientes en riesgo y ofrecer incentivos para su retención.
+### Recommendations
+1. **Encourage Long-Term Contracts:** Offer discounts or exclusive benefits for 6 or 12-month contracts.
+2. **Promote Group Classes:** Increase offerings and run promotions.
+3. **Effective Segmentation:** Personalize strategies based on identified clusters.
+4. **Proactive Monitoring:** Identify at-risk customers and provide incentives for retention.
 
 ---
 
-**Fecha: 2025-01-06**
+**Date: 2025-01-06**  
 **Francisco SLG**
-
-
 
